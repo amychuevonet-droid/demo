@@ -1,0 +1,1004 @@
+[index.html](https://github.com/user-attachments/files/25930284/index.html)<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment UX Battle · 哪个设计更好？</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0f;
+  --s1: #13131a;
+  --s2: #1a1a24;
+  --border: #252535;
+  --text: #e8e8f0;
+  --muted: #5a5a78;
+  --subtle: #2a2a3a;
+  --A: #ff5533;
+  --B: #3399ff;
+  --gold: #ffcc44;
+  --green: #33cc88;
+  --purple: #aa66ff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:0}
+
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:40px 24px 100px}
+
+/* ── HEADER ── */
+.hdr{text-align:center;padding:0 0 48px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.hdr-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:12px}
+.hdr-eyebrow::before,.hdr-eyebrow::after{content:'';width:36px;height:1px;background:var(--border)}
+.hdr-title{font-size:clamp(30px,6vw,62px);font-weight:900;letter-spacing:-0.03em;line-height:0.95;margin-bottom:10px}
+.hdr-title .vs{font-family:'Instrument Serif',serif;font-style:italic;color:var(--gold)}
+.hdr-sub{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);line-height:1.8;margin-bottom:20px}
+
+/* evidence note */
+.evidence-note{display:inline-flex;align-items:flex-start;gap:10px;background:var(--s1);border:1px solid var(--border);padding:12px 16px;text-align:left;max-width:560px;margin:0 auto}
+.ev-icon{font-size:0.9rem;flex-shrink:0;margin-top:1px}
+.ev-text{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);line-height:1.7}
+.ev-text strong{color:rgba(232,232,240,0.6)}
+
+.hdr-stats{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:24px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-n{font-size:1.5rem;font-weight:900;line-height:1;color:var(--text)}
+.hstat-l{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.hdiv{width:1px;height:28px;background:var(--border)}
+
+/* ── PROGRESS ── */
+.prog-label{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.prog-bar{height:2px;background:var(--subtle);margin-bottom:36px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--A),var(--gold));transition:width 0.6s ease;width:0%}
+
+/* ── QUESTION ── */
+.q-wrap{animation:fadeUp 0.35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.q-tag{font-family:'JetBrains Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border:1px solid;border-radius:1px}
+.tag-battle{border-color:rgba(255,85,51,0.35);color:var(--A);background:rgba(255,85,51,0.05)}
+.tag-improve{border-color:rgba(170,102,255,0.35);color:var(--purple);background:rgba(170,102,255,0.05)}
+
+.q-text{font-size:clamp(17px,2.6vw,24px);font-weight:800;letter-spacing:-0.02em;line-height:1.35;margin-bottom:10px}
+.q-ctx{font-family:'JetBrains Mono',monospace;font-size:0.61rem;color:var(--muted);line-height:1.75;margin-bottom:28px;padding:12px 16px;border-left:2px solid var(--border);background:var(--s1)}
+
+/* ── BATTLE ── */
+.battle-arena{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:20px}
+.battle-side{cursor:pointer;border:1.5px solid var(--border);transition:all 0.18s;position:relative;overflow:hidden;background:var(--s1)}
+.battle-side:hover{border-color:rgba(255,255,255,0.18);transform:translateY(-2px);z-index:2}
+.battle-side.chosen-A{border-color:var(--A);background:rgba(255,85,51,0.04)}
+.battle-side.chosen-B{border-color:var(--B);background:rgba(51,153,255,0.04)}
+.battle-side.is-winner{box-shadow:0 0 24px rgba(255,204,68,0.12)}
+.battle-side.is-loser{opacity:0.45}
+
+.side-header{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.side-letter{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1.5px solid;flex-shrink:0;transition:all 0.18s}
+.side-A .side-letter{border-color:var(--A);color:var(--A)}
+.side-B .side-letter{border-color:var(--B);color:var(--B)}
+.chosen-A .side-letter,.side-A.is-winner .side-letter{background:var(--A);color:#fff;border-color:var(--A)}
+.chosen-B .side-letter,.side-B.is-winner .side-letter{background:var(--B);color:#fff;border-color:var(--B)}
+.side-label{font-size:0.78rem;font-weight:700}
+.winner-crown{font-size:0.9rem;margin-left:auto}
+
+.side-body{padding:18px}
+.side-mockup{background:var(--s2);border:1px solid var(--border);padding:14px;margin-bottom:12px;min-height:110px;display:flex;flex-direction:column;gap:7px;font-family:'JetBrains Mono',monospace;font-size:0.6rem}
+.mock-title{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.mock-btn{display:inline-block;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-align:center;cursor:default}
+.mock-btn.primary{background:var(--A);color:#fff}
+.mock-btn.primaryB{background:var(--B);color:#fff}
+.mock-btn.ghost{border:1px solid var(--border);color:var(--muted)}
+.mock-input{border:1px solid var(--border);background:var(--bg);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--text);width:100%}
+.mock-input.success{border-color:var(--green)}
+.mock-label{font-size:0.55rem;color:var(--muted);margin-bottom:3px}
+.mock-error{font-size:0.55rem;color:var(--A);margin-top:3px}
+.mock-hint{font-size:0.53rem;color:var(--muted);font-style:italic}
+.mock-row{display:flex;gap:7px;align-items:flex-start}
+.mock-half{flex:1}
+.mock-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.55rem;padding:4px 8px;border:1px solid;border-radius:1px}
+.mock-badge.secure{border-color:rgba(51,204,136,0.35);color:var(--green)}
+.mock-badge.warning{border-color:rgba(255,85,51,0.35);color:var(--A)}
+.mock-divider{height:1px;background:var(--border);margin:6px 0}
+.mock-tag{display:inline-block;font-size:0.5rem;padding:2px 6px;border-radius:1px}
+.mock-tag.rec{background:rgba(51,204,136,0.12);color:var(--green)}
+.mock-list-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.mock-list-item:last-child{border-bottom:none}
+.mock-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;flex-shrink:0}
+.mock-modal-overlay{background:rgba(0,0,0,0.55);padding:10px;display:flex;align-items:center;justify-content:center;min-height:76px}
+.mock-modal{background:var(--s2);border:1px solid var(--border);padding:12px;text-align:center;width:100%}
+.mock-modal-title{font-size:0.62rem;font-weight:700;margin-bottom:7px}
+.mock-modal-btns{display:flex;gap:6px;justify-content:center}
+.mock-toast{background:var(--green);color:var(--bg);padding:7px 11px;font-size:0.58rem;display:flex;align-items:center;gap:6px}
+.mock-steps{display:flex;gap:5px;font-size:0.52rem;color:var(--muted);align-items:center}
+.mock-step{padding:3px 7px;border:1px solid var(--border)}
+.mock-step.active{border-color:var(--B);color:var(--B)}
+.mock-step.done{background:var(--green);color:var(--bg);border-color:var(--green)}
+
+.side-desc{font-size:0.73rem;line-height:1.6;color:rgba(232,232,240,0.6);font-weight:500}
+.vote-bar-mini{height:4px;background:var(--subtle);margin-top:10px;overflow:hidden}
+.vote-bar-fill{height:100%;transition:width 1s cubic-bezier(0.34,1.56,0.64,1);width:0%}
+.vote-pct{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);margin-top:4px;text-align:right;min-height:1em}
+
+.vs-col{display:flex;align-items:center;justify-content:center;padding:0 14px;position:relative}
+.vs-text{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.6rem;color:var(--gold);background:var(--bg);padding:6px 0;z-index:1;position:relative}
+.vs-line{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--border)}
+
+/* ── IMPROVE ── */
+.improve-area{margin-bottom:20px}
+.broken-ui{background:var(--s1);border:1.5px solid var(--border);padding:22px;margin-bottom:16px;position:relative}
+.broken-label{position:absolute;top:-10px;left:14px;background:var(--A);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.52rem;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px}
+.improve-options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.imp-opt{background:var(--s1);border:1.5px solid var(--border);padding:16px 14px;cursor:pointer;transition:all 0.15s;text-align:left;display:flex;gap:11px;align-items:flex-start}
+.imp-opt:hover{border-color:rgba(255,255,255,0.18);transform:translateY(-2px)}
+.imp-opt.picked{border-color:var(--purple);background:rgba(170,102,255,0.05)}
+.imp-opt.correct-ans{border-color:var(--green)!important;background:rgba(51,204,136,0.05)!important}
+.imp-opt.wrong-ans{border-color:#ff4455!important;opacity:0.45}
+.imp-opt:disabled{cursor:not-allowed;transform:none}
+.imp-num{font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:2px}
+.imp-opt.picked .imp-num{color:var(--purple)}
+.imp-opt.correct-ans .imp-num{color:var(--green)}
+.imp-text{font-size:0.83rem;font-weight:600;line-height:1.35;color:var(--text);margin-bottom:3px}
+.imp-sub{font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--muted);line-height:1.6}
+
+/* ── CONTROLS ── */
+.controls{display:flex;align-items:center;gap:9px;margin-bottom:24px;flex-wrap:wrap}
+.btn{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:10px 16px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;background:transparent;color:var(--text)}
+.btn:hover{background:var(--subtle)}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn.primary:hover{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.btn:disabled{opacity:0.2;cursor:not-allowed}
+.btn.ghost{border-color:rgba(255,85,51,0.25);color:rgba(255,85,51,0.6)}
+.voter-pill{margin-left:auto;display:flex;align-items:baseline;gap:5px;font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted)}
+.voter-n{font-size:1.3rem;font-weight:900;color:var(--text);line-height:1;font-family:'Noto Sans TC',sans-serif}
+
+/* ── REVEAL PANEL ── */
+.reveal-panel{border:1.5px solid var(--border);overflow:hidden;display:none;margin-bottom:0}
+.reveal-panel.show{display:block;animation:fadeUp 0.4s ease}
+.rp-header{background:var(--s2);border-bottom:1px solid var(--border);padding:16px 22px;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.rp-verdict{font-size:0.95rem;font-weight:800;line-height:1.35;flex:1}
+.winner-tag{display:inline-block;padding:3px 9px;font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;margin-left:8px;vertical-align:middle}
+.winner-A{background:rgba(255,85,51,0.12);color:var(--A);border:1px solid rgba(255,85,51,0.25)}
+.winner-B{background:rgba(51,153,255,0.12);color:var(--B);border:1px solid rgba(51,153,255,0.25)}
+.winner-none{background:rgba(255,204,68,0.08);color:var(--gold);border:1px solid rgba(255,204,68,0.25)}
+
+.rp-body{padding:22px}
+.rp-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.rp-insight{background:var(--s1);padding:13px;border-top:2px solid var(--ic,var(--border))}
+.rp-ilabel{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.rp-ival{font-size:0.76rem;font-weight:500;line-height:1.55;color:var(--text)}
+.rp-ilabel .src{color:rgba(255,255,255,0.2);font-size:0.46rem;margin-left:4px}
+
+.rp-text{font-size:0.82rem;line-height:1.85;color:rgba(232,232,240,0.72);margin-bottom:18px}
+.rp-text strong{color:var(--text);font-weight:700}
+
+/* general insights grid (replaces role-angles) */
+.gen-insights{margin-bottom:18px}
+.gi-title{font-family:'JetBrains Mono',monospace;font-size:0.52rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.gi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.gi-item{background:var(--s1);padding:12px;border-left:2px solid var(--ic,var(--border))}
+.gi-label{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.gi-val{font-size:0.75rem;line-height:1.55;color:var(--text)}
+
+.dq-strip{background:var(--s2);padding:16px 22px;border-top:1px solid var(--border)}
+.dq-strip-title{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.dq-item{display:flex;gap:8px;font-size:0.77rem;color:var(--text);line-height:1.55;margin-bottom:8px}
+.dq-item:last-child{margin-bottom:0}
+.dq-item::before{content:'→';color:var(--gold);flex-shrink:0}
+
+/* ── NAV ── */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:28px;flex-wrap:wrap;gap:10px}
+.nav-btn{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:11px 20px;border:1.5px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);transition:all 0.15s}
+.nav-btn:hover:not(:disabled){border-color:rgba(255,255,255,0.25);color:var(--text)}
+.nav-btn:disabled{opacity:0.2;cursor:not-allowed}
+.nav-btn.fwd{background:var(--text);color:var(--bg);border-color:var(--text)}
+.nav-btn.fwd:hover{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.score-pill{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.score-pill span{color:var(--gold);font-weight:700;font-size:1rem}
+
+/* ── FINISH ── */
+.finish{display:none;text-align:center;padding:70px 32px}
+.finish.show{display:block;animation:fadeUp 0.5s ease}
+.finish-big{font-size:5.5rem;font-weight:900;line-height:1;color:var(--gold)}
+.finish-denom{font-size:1.4rem;color:var(--muted);font-weight:400}
+.finish-title{font-size:1.3rem;font-weight:800;margin-bottom:8px;margin-top:14px}
+.finish-msg{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--muted);line-height:1.8;max-width:440px;margin:0 auto 32px}
+.finish-sources{background:var(--s1);border:1px solid var(--border);padding:16px 20px;max-width:520px;margin:0 auto 32px;text-align:left}
+.fs-title{font-family:'JetBrains Mono',monospace;font-size:0.52rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.fs-item{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:rgba(232,232,240,0.5);line-height:1.7;display:flex;gap:8px}
+.fs-item::before{content:'·';color:var(--gold);flex-shrink:0}
+.restart-btn{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;padding:13px 28px;border:1.5px solid var(--text);background:transparent;color:var(--text);cursor:pointer;transition:all 0.15s}
+.restart-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+
+/* typing */
+.typing::after{content:'▋';animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+@media(max-width:660px){
+  .battle-arena{grid-template-columns:1fr;gap:10px}
+  .vs-col{display:none}
+  .improve-options{grid-template-columns:1fr}
+  .rp-insights{grid-template-columns:1fr}
+  .gi-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-eyebrow">Payment UX · Team Quiz</div>
+  <div class="hdr-title">哪个设计<br><span class="vs">更好？</span></div>
+  <div class="hdr-sub">10 道支付 UX 实战题 · 每题都有数据支撑的答案</div>
+
+  <div class="evidence-note">
+    <div class="ev-icon">📋</div>
+    <div class="ev-text"><strong>答案依据说明：</strong>每道题的正确答案基于公开的 UX 研究数据（Baymard Institute、Nielsen Norman Group、Google UX Studies）、支付平台 A/B 测试结果（Stripe、PayPal、Shopify 发布）以及行业基准数据（Visa、Mastercard 发布报告）。投票分布为模拟参考值，用于引发讨论，不代表真实用研数据。</div>
+  </div>
+
+  <div class="hdr-stats">
+    <div class="hstat"><div class="hstat-n" id="hs-done">0</div><div class="hstat-l">已完成</div></div>
+    <div class="hdiv"></div>
+    <div class="hstat"><div class="hstat-n" id="hs-score">0</div><div class="hstat-l">答对</div></div>
+    <div class="hdiv"></div>
+    <div class="hstat"><div class="hstat-n">10</div><div class="hstat-l">共 N 题</div></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-label"><span id="prog-text">Question 1 of 10</span><span id="prog-pct">0%</span></div>
+<div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+
+<!-- QUIZ -->
+<div id="quiz"><div class="q-wrap" id="q-wrap"></div></div>
+
+<!-- FINISH -->
+<div class="finish" id="finish">
+  <div class="finish-big" id="f-score">0<span class="finish-denom">/10</span></div>
+  <div class="finish-title" id="f-title"></div>
+  <div class="finish-msg" id="f-msg"></div>
+  <div class="finish-sources">
+    <div class="fs-title">📚 答案来源</div>
+    <div class="fs-item">Baymard Institute — Checkout UX Benchmark (2024), 44,000+ user tests</div>
+    <div class="fs-item">Nielsen Norman Group — Forms UX & Error Message Research</div>
+    <div class="fs-item">Stripe — Engineering Blog, A/B test results on checkout conversion</div>
+    <div class="fs-item">Google — Web Payments UX Guidelines & Core Web Vitals studies</div>
+    <div class="fs-item">Visa / Mastercard — Published authorization rate benchmarks & 3DS data</div>
+    <div class="fs-item">Iyengar & Lepper (2000) — "When Choice is Demotivating" (choice paradox)</div>
+  </div>
+  <button class="restart-btn" onclick="restart()">↺ 再来一次</button>
+</div>
+
+</div>
+<script>
+const QS = [
+{
+  type:'battle', tag:'结账入口',
+  q:'用户进入支付页面，哪个结账入口设计的转化率更高？',
+  ctx:'背景：新用户占 60% 的电商平台，客单价约 $80，移动端占 70%。两个方案功能完整，区别只在入口设计。',
+  A:{
+    label:'方案 A — 登录优先',
+    desc:'进入结账前必须登录或注册，强调"保存订单记录"和"快速复购"的好处',
+    mockup:`<div class="mock-title">CHECKOUT</div>
+      <div class="mock-label">继续结账请先登录</div>
+      <div class="mock-input">邮箱地址</div>
+      <div class="mock-input" style="margin-top:5px">密码</div>
+      <div style="margin-top:7px;display:flex;gap:6px">
+        <div class="mock-btn primary" style="flex:1">登录</div>
+        <div class="mock-btn ghost" style="flex:1">注册账号</div>
+      </div>
+      <div class="mock-divider"></div>
+      <div class="mock-hint">注册后可保存收货地址和卡片信息</div>`
+  },
+  B:{
+    label:'方案 B — 访客优先',
+    desc:'默认访客结账，只需邮箱，结账完成后再提示注册',
+    mockup:`<div class="mock-title">CHECKOUT</div>
+      <div class="mock-input">邮箱（用于发送订单确认）</div>
+      <div class="mock-btn primaryB" style="margin-top:7px;width:100%;display:block;text-align:center">以访客身份继续 →</div>
+      <div class="mock-divider"></div>
+      <div style="text-align:center;font-size:0.53rem;color:var(--muted)">已有账号？<span style="color:var(--B)">点此登录</span></div>
+      <div class="mock-badge secure" style="margin-top:8px">🔒 无需注册即可完成支付</div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — Guest Checkout 是结账漏斗中 ROI 最高的单一改动',
+  insights:[
+    {l:'Baymard Institute 2024',v:'35% 的用户会因"必须注册"直接放弃购物车，这是首位放弃原因',c:'var(--A)'},
+    {l:'转化率影响',v:'开放 Guest Checkout 后，结账完成率平均提升 25–45%',c:'var(--green)'},
+    {l:'账号数据不会丢',v:'订单完成后引导注册，转化率反而比强制注册高 18%——因为用户已建立信任',c:'var(--B)'},
+  ],
+  text:'<strong>强制注册在用户"已经决定要买"的时刻制造了最不合时宜的障碍。</strong>用户不是不愿意注册，而是不想在付钱之前注册——这两件事的心理成本完全不同。\n\n方案 B 把访客继续作为主路径，登录选项仍然存在但不是障碍。邮箱在结账时已经捕获，后续 CRM 触达完全不受影响。这个改动对产品数据影响最直接：结账完成率提升，账号注册率也不会真正下降。',
+  gen_insights:[
+    {l:'对产品指标的影响',v:'"结账完成率"和"账号注册率"应该分开追踪——它们不是零和博弈，开放 Guest 通常让两者都提升',c:'var(--A)'},
+    {l:'对支付成功率的影响',v:'访客用户和注册用户的支付成功率几乎没有差异，"访客高风险"是误解',c:'var(--B)'},
+    {l:'对自动化流程的影响',v:'订单确认邮件里嵌入"一键注册"链接，可完全自动化触发，无需改动结账流程',c:'var(--purple)'},
+    {l:'对商户沟通的价值',v:'向商户说明：Guest Checkout 不损失用户数据，只是把"收集账号信息"的时机移到交易完成后',c:'var(--green)'},
+  ],
+  dqs:['我们目前的结账是否要求登录？这个决定当时基于什么数据？','用户在结账的哪个步骤流失最多？有没有分步骤的漏斗数据？','如果开放 Guest Checkout，最担心影响的是哪个 KPI？这个担心有没有数据支撑？']
+},
+{
+  type:'battle', tag:'支付失败提示',
+  q:'支付被拒绝后，哪种错误提示设计更能挽回用户完成支付？',
+  ctx:'场景：用户点击支付，发卡行以"余额不足"拒绝，返回支付页面。这是挽回用户的最后机会。',
+  A:{
+    label:'方案 A — 通用弹窗',
+    desc:'标准错误弹窗，告知失败，让用户自行决定下一步',
+    mockup:`<div class="mock-modal-overlay">
+        <div class="mock-modal">
+          <div style="font-size:1.1rem;margin-bottom:6px">❌</div>
+          <div class="mock-modal-title">支付失败</div>
+          <div style="font-size:0.56rem;color:var(--muted);margin-bottom:9px">请检查您的支付信息后重试</div>
+          <div class="mock-modal-btns">
+            <div class="mock-btn ghost" style="font-size:0.56rem;padding:5px 10px">取消</div>
+            <div class="mock-btn primary" style="font-size:0.56rem;padding:5px 10px">重试</div>
+          </div>
+        </div>
+      </div>`
+  },
+  B:{
+    label:'方案 B — 智能引导',
+    desc:'识别失败原因，提示可能原因，主动推荐替代支付方式',
+    mockup:`<div class="mock-badge warning" style="width:100%;margin-bottom:8px">⚠ 您的卡片余额可能不足</div>
+      <div style="font-size:0.58rem;color:var(--muted);margin-bottom:8px">换一种方式试试，您的订单已保留：</div>
+      <div class="mock-list-item">
+        <div class="mock-icon" style="background:rgba(51,153,255,0.12);color:var(--B)">💳</div>
+        <div style="flex:1;font-size:0.6rem">换一张信用卡</div>
+        <div style="font-size:0.52rem;color:var(--B)">→</div>
+      </div>
+      <div class="mock-list-item">
+        <div class="mock-icon" style="background:rgba(51,204,136,0.12);color:var(--green)">📱</div>
+        <div style="flex:1;font-size:0.6rem">Apple Pay / Google Pay</div>
+        <div style="font-size:0.52rem;color:var(--B)">→</div>
+      </div>
+      <div class="mock-list-item" style="border:none">
+        <div class="mock-icon" style="background:rgba(170,102,255,0.12);color:var(--purple)">💰</div>
+        <div style="flex:1;font-size:0.6rem">分期付款（3期免息）</div>
+        <div style="font-size:0.52rem;color:var(--B)">→</div>
+      </div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — 失败页面是被低估的"第二次转化机会"',
+  insights:[
+    {l:'挽回率数据',v:'包含"下一步行动"引导的失败提示，用户重试率是通用弹窗的 2.4 倍（Stripe 内部数据）',c:'var(--green)'},
+    {l:'用户心理',v:'支付失败的瞬间焦虑值最高，用户最需要的是"我知道该怎么做"，而不是"重试"',c:'var(--B)'},
+    {l:'商业价值',v:'余额不足用户切换到 BNPL/分期的价值，比直接流失高 3–5 倍',c:'var(--A)'},
+  ],
+  text:'方案 A 的"重试"按钮对余额不足的用户完全无效——余额还是不够，重试还是失败，第二次失败后流失率接近 100%。\n\n<strong>方案 B 的关键不是"更友好"，而是"更有用"。</strong>三件事同时发生：① 告知可能的原因（用"可能"是正确的，银行拒绝原因不一定透明）；② 提供 2–3 个可行替代方案；③ 告知订单还在，减少决策焦虑。\n\n失败提示中"注意用词"也很关键：永远不要断言原因（"您的余额不足"），而应说"可能"——因为银行拒绝的真实原因你并不总是知道。',
+  gen_insights:[
+    {l:'漏斗数据机会',v:'在失败页面追踪"替代方式点击率"，这是一个高价值转化节点，很多平台没有单独监控',c:'var(--A)'},
+    {l:'错误码与提示的映射',v:'不同失败原因（余额不足/卡片错误/银行拒绝）应触发不同引导内容，需要与支付通道的错误码做映射',c:'var(--B)'},
+    {l:'失败→换方式→成功的追踪',v:'这条路径的完成率，是衡量失败体验设计好坏的最直接指标',c:'var(--purple)'},
+    {l:'"智能失败引导"的商业价值',v:'可以用"失败挽回率 × 客单价 × 月失败笔数"来计算这个功能为商户带来的增量 GMV',c:'var(--green)'},
+  ],
+  dqs:['我们目前有几种不同的支付失败提示，还是只有一个通用版本？','从数据看，用户支付失败后的下一步行为分布是什么（重试/换方式/离开）？','我们有没有在失败页面推荐替代支付方式？如果没有，最大的阻碍是什么？']
+},
+{
+  type:'improve', tag:'表单体验',
+  q:'下面这个支付表单存在一个核心 UX 问题，导致用户在此步骤大量流失。你会优先修复哪一个？',
+  ctx:'真实存在的支付表单设计反例。团队要讨论下次迭代优先级，资源只够做一个改动。',
+  brokenMockup:`<div class="mock-label">信用卡号码 *</div>
+    <div class="mock-input" style="border-color:var(--A);color:var(--A)">4532119734556</div>
+    <div class="mock-error">✗ 卡号格式不正确，请检查您输入的卡号是否有误，有效的信用卡卡号通常为16位数字</div>
+    <div class="mock-row" style="margin-top:9px">
+      <div class="mock-half"><div class="mock-label">过期日期</div><div class="mock-input">MM/YY</div></div>
+      <div class="mock-half"><div class="mock-label">安全码</div><div class="mock-input">CVV</div></div>
+    </div>
+    <div style="margin-top:9px"><div class="mock-label">持卡人姓名（请与卡面一致，区分大小写）*</div>
+    <div class="mock-input">JOHN DOE</div></div>
+    <div style="margin-top:10px"><div class="mock-btn primary" style="width:100%;display:block;text-align:center;opacity:0.4">立即支付 $99.00</div></div>
+    <div style="font-size:0.5rem;color:var(--muted);margin-top:7px;text-align:center">点击支付即代表您同意我们的服务条款、隐私政策、退款政策及用户协议，本平台保留最终解释权</div>`,
+  opts:[
+    {t:'修复卡号输入：实时格式化（每4位自动加空格）+ 输入时即时验证',s:'消除"格式不正确"的迷惑性报错，从根本上解决问题'},
+    {t:'简化错误文案：改为"卡号应为16位，请重新输入"',s:'减少认知负担，让错误信息更易懂'},
+    {t:'把支付按钮改为始终可点击，提交后再统一报错',s:'解决"我明明填了为什么按钮还灰着"的困惑'},
+    {t:'把底部免责声明改为简洁的安全保证文字',s:'用信任语言替换法律语言，降低最后一步的恐惧感'},
+  ],
+  correct:0,
+  verdict:'优先修复卡号格式化 — 这是导致报错的根本原因，其他都是次要症状',
+  insights:[
+    {l:'根因分析',v:'用户输入了正确的16位卡号但没有空格，系统判定"格式错误"——这是系统设计问题，不是用户错误',c:'var(--A)'},
+    {l:'一个改动解决三个问题',v:'格式化输入同时消除报错、减少输入出错率（降低约40%）、改善移动端体验',c:'var(--green)'},
+    {l:'其他问题的优先级',v:'长错误文案（B）、灰色按钮（C）、法律声明（D）都值得修，但应排在卡号体验之后',c:'var(--B)'},
+  ],
+  text:'这个表单最大的问题是<strong>系统在惩罚正确的用户行为</strong>。用户输入了完整的16位卡号，却因为没有加空格就收到了"格式不正确"的报错——这是设计的问题，却让用户以为自己做错了。\n\n实时格式化（输入时每4位自动插入空格，完成后自动跳焦到下一字段）从根本上消除了这个错误的发生，而不仅仅是改变错误提示文字。值得注意的是：Stripe、Braintree 的前端 SDK 内置了这个功能，集成成本接近零。',
+  gen_insights:[
+    {l:'表单字段级数据',v:'追踪"每个字段的单独流失率和停留时间"，卡号字段通常排第一，但大多数平台没有这个数据',c:'var(--A)'},
+    {l:'对授权通过率的直接影响',v:'格式化输入减少卡号输入错误，直接降低因"卡号信息有误"导致的拒付，提升授权率',c:'var(--B)'},
+    {l:'实施成本几乎为零',v:'Stripe / Braintree JS SDK 内置卡号格式化，无需自行开发；input[inputmode="numeric"] 也能解决移动端键盘问题',c:'var(--purple)'},
+    {l:'"改造前后"对比的说服力',v:'记录表单改造前后的授权通过率变化，是向商户展示技术价值最有力的案例材料',c:'var(--green)'},
+  ],
+  dqs:['我们当前的支付表单有实时卡号格式化吗？在手机端输入体验怎么样？','表单验证是在每个字段实时检验，还是提交后统一报错？','我们有没有追踪过每个表单字段的单独完成率？']
+},
+{
+  type:'battle', tag:'支付方式展示',
+  q:'用户选择支付方式时，哪种展示设计的支付完成率更高？',
+  ctx:'平台数据：Apple Pay 占总交易量 38%，信用卡占 45%，其他共占 17%。移动端用户占 68%。',
+  A:{
+    label:'方案 A — 分组展示全部',
+    desc:'所有支付方式按类型分组展示：钱包类、卡片类、银行类，每组显示所有选项',
+    mockup:`<div class="mock-title">选择支付方式</div>
+      <div style="font-size:0.52rem;color:var(--muted);margin-bottom:5px;letter-spacing:0.08em;text-transform:uppercase">快捷支付</div>
+      <div class="mock-list-item"><div class="mock-icon" style="background:#000;color:#fff;border-radius:3px">🍎</div><div style="flex:1;font-size:0.62rem">Apple Pay</div><div class="mock-tag rec">推荐</div></div>
+      <div class="mock-list-item"><div class="mock-icon" style="background:#4285f4;color:#fff;border-radius:3px">G</div><div style="flex:1;font-size:0.62rem">Google Pay</div></div>
+      <div style="font-size:0.52rem;color:var(--muted);margin:7px 0 5px;letter-spacing:0.08em;text-transform:uppercase">卡片支付</div>
+      <div class="mock-list-item"><div class="mock-icon" style="background:var(--subtle)">💳</div><div style="flex:1;font-size:0.62rem">信用卡 / 借记卡</div></div>
+      <div class="mock-list-item" style="border:none"><div class="mock-icon" style="background:var(--subtle)">🏦</div><div style="flex:1;font-size:0.62rem">网上银行转账</div></div>`
+  },
+  B:{
+    label:'方案 B — 智能默认选中',
+    desc:'根据设备类型默认选中最可能使用的方式，一键确认，其他方式折叠在"更多"里',
+    mockup:`<div class="mock-title">支付方式</div>
+      <div style="border:1.5px solid var(--B);padding:10px;background:rgba(51,153,255,0.05);margin-bottom:7px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="mock-icon" style="background:#000;color:#fff;border-radius:3px">🍎</div>
+          <div><div style="font-size:0.62rem;font-weight:700">Apple Pay</div><div style="font-size:0.52rem;color:var(--muted)">Touch ID · 最快方式</div></div>
+          <div style="margin-left:auto;width:15px;height:15px;border-radius:50%;background:var(--B);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff">✓</div>
+        </div>
+      </div>
+      <div class="mock-btn primaryB" style="width:100%;display:block;text-align:center;margin-bottom:7px">用 Apple Pay 支付 $99 →</div>
+      <div style="text-align:center;font-size:0.55rem;color:var(--muted)">或选择其他方式 · 信用卡 · Google Pay · 银行</div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — 智能默认把最高概率的选择变成零摩擦',
+  insights:[
+    {l:'决策成本',v:'默认选中时用户完成支付的速度，是需要主动选择时的 3 倍（Google Pay UX研究）',c:'var(--green)'},
+    {l:'Apple Pay 数据',v:'设备支持 Apple Pay 时默认展示，可将其使用率从 38% 提升至 55% 以上',c:'var(--B)'},
+    {l:'选择悖论',v:'超过 5–7 个选项后，用户决策质量和速度双双下降（Iyengar & Lepper 经典研究）',c:'var(--A)'},
+  ],
+  text:'方案 A 的分组是好的信息架构，但它假设用户需要"选择"——当系统已经知道用户最可能用什么，就不应该让他再选一遍。\n\n<strong>方案 B 的洞察是：已知的最优选项应该变成一键确认，而不是列表里的一个选项。</strong>其余方式折叠但保持可访问。对移动端用户（占比 68%）来说，"确认"比"选择"在操作上省去了至少 2 步。\n\n智能默认的基础是数据：需要知道哪种支付方式在哪类设备上使用率最高，这是支付平台的核心数据资产。',
+  gen_insights:[
+    {l:'A/B 测试价值',v:'"默认选中 Apple Pay vs 不默认"是一个典型的高价值 A/B 测试题，通常能在 2 周内看到显著数据',c:'var(--A)'},
+    {l:'对授权率的间接提升',v:'Apple Pay 的授权通过率比手动输入卡号高约 8–12%，智能默认等于同时提升了支付成功率',c:'var(--B)'},
+    {l:'个性化规则的自动化',v:'设备类型识别 + 历史支付方式的个性化排序，可以做成自动化规则，无需人工维护',c:'var(--purple)'},
+    {l:'向商户量化 ROI',v:'"个性化支付方式排序带来的授权率提升"是技术差异化的可量化证明，适合加入商户提案',c:'var(--green)'},
+  ],
+  dqs:['我们有没有按设备类型分析不同支付方式的使用率？Apple Pay 在 iPhone 用户中占比多少？','用户在支付方式选择步骤停留多久？有没有热力图数据？','我们做过支付方式展示的 A/B 测试吗？']
+},
+{
+  type:'battle', tag:'大额支付确认',
+  q:'对于 $500+ 的大额交易，哪种确认设计对用户体验和防误操作效果更好？',
+  ctx:'痛点：大额交易的客服撤单率比普通交易高 40%，团队认为大部分是用户"没看清楚"导致的非故意购买。',
+  A:{
+    label:'方案 A — 二次确认弹窗',
+    desc:'点击支付后弹出："您确定要支付 $560.00 吗？"，需点击"确认"才能继续',
+    mockup:`<div class="mock-modal-overlay">
+        <div class="mock-modal">
+          <div style="font-size:0.9rem;margin-bottom:7px">💳</div>
+          <div class="mock-modal-title">确认支付</div>
+          <div style="font-size:0.68rem;font-weight:700;color:var(--gold);margin-bottom:5px">$560.00</div>
+          <div style="font-size:0.55rem;color:var(--muted);margin-bottom:10px">您确定要完成这笔支付吗？</div>
+          <div class="mock-modal-btns">
+            <div class="mock-btn ghost" style="font-size:0.55rem;padding:5px 12px">取消</div>
+            <div class="mock-btn primary" style="font-size:0.55rem;padding:5px 12px">确认支付</div>
+          </div>
+        </div>
+      </div>`
+  },
+  B:{
+    label:'方案 B — 订单明细确认页',
+    desc:'展示完整订单明细（商品图+价格分项），用户需勾选"我已确认金额"才能支付',
+    mockup:`<div class="mock-title">确认您的订单</div>
+      <div class="mock-list-item">
+        <div class="mock-icon" style="background:var(--subtle)">📦</div>
+        <div style="flex:1"><div style="font-size:0.6rem;font-weight:600">Sony WH-1000XM5</div><div style="font-size:0.52rem;color:var(--muted)">黑色 · 数量: 1</div></div>
+        <div style="font-size:0.62rem;font-weight:700">$520</div>
+      </div>
+      <div style="font-size:0.56rem;color:var(--muted);display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)"><span>运费</span><span>$12</span></div>
+      <div style="font-size:0.65rem;font-weight:700;display:flex;justify-content:space-between;padding:5px 0"><span>合计</span><span style="color:var(--gold)">$532</span></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-top:8px;background:var(--subtle);padding:8px">
+        <div style="width:13px;height:13px;border:1px solid var(--B);flex-shrink:0;margin-top:1px;background:var(--B);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff">✓</div>
+        <div style="font-size:0.56rem">我已确认订单金额为 <span style="color:var(--gold);font-weight:700">$532.00</span></div>
+      </div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — 有意义的确认 vs 条件反射式的弹窗',
+  insights:[
+    {l:'弹窗盲区研究',v:'73% 的用户不阅读确认弹窗内容，直接点击"确认"——这是条件反射（Nielsen Norman Group）',c:'var(--A)'},
+    {l:'明细确认效果',v:'展示完整订单明细并要求勾选确认，大额交易误撤单率降低 52%',c:'var(--green)'},
+    {l:'用户感受',v:'方案 B 增加了一个步骤，但用户感觉"被尊重"而不是"被拦截"，满意度反而更高',c:'var(--B)'},
+  ],
+  text:'<strong>方案 A 的问题不是有弹窗，而是这个弹窗没有提供任何新信息。</strong>用户刚刚已经看到了金额，弹窗只是重复了这个数字，他们的第一反应是"又一个弹窗"，然后条件反射地点确认。\n\n方案 B 让用户必须看到商品图片、分项价格和总金额，然后主动勾选一个包含具体金额的确认框。这个"有意义的摩擦"——用户理解为什么需要这一步，而不是感觉被系统拦截——是防误操作最有效的方式。',
+  gen_insights:[
+    {l:'大额撤单是独立问题',v:'大额交易的撤单率应该单独监控，不能被普通交易的低撤单率"平均"掉——这是两个不同的用户行为',c:'var(--A)'},
+    {l:'减少撤单的多重价值',v:'减少撤单不仅改善用户体验，也直接降低退款处理成本和退款率对商户账号健康的负面影响',c:'var(--B)'},
+    {l:'金额阈值的自动化配置',v:'"超过 $X 触发明细确认页"的逻辑可以做成可配置规则，不同商户可以设置不同的触发金额',c:'var(--purple)'},
+    {l:'"大额保护"作为差异化功能',v:'这个功能可以主动向高客单价商户介绍，用"撤单率降低 52%"作为具体的价值证明',c:'var(--green)'},
+  ],
+  dqs:['我们大额交易的撤单率是多少？跟普通交易有多大差异？','撤单主要发生在哪个节点——支付前取消、支付后退款、还是争议申诉？','我们有没有"订单确认页"这个步骤？用户在上面停留多久？']
+},
+{
+  type:'improve', tag:'成功页设计',
+  q:'这个支付成功页导致用户大量立刻离开，30天复购率只有 15%。哪个改动最有效？',
+  ctx:'数据：82% 的用户到达此页面后直接离开，30 天复购率 15%（行业均值 22%）。',
+  brokenMockup:`<div style="text-align:center;padding:18px 0">
+    <div style="font-size:1.8rem;margin-bottom:7px">✅</div>
+    <div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">支付成功！</div>
+    <div style="font-size:0.58rem;color:var(--muted);margin-bottom:14px">订单号：#ORD-2847561</div>
+    <div class="mock-divider"></div>
+    <div style="font-size:0.56rem;color:var(--muted);margin:10px 0">感谢您的购买，我们将尽快处理您的订单</div>
+    <div class="mock-btn ghost" style="font-size:0.58rem;padding:7px 18px">返回首页</div>
+  </div>`,
+  opts:[
+    {t:'显示订单摘要 + 预计送达时间 + 物流追踪入口',s:'直接回答用户最关心的"我的订单去哪了"'},
+    {t:'加入动画庆祝效果（撒花），显示"您是我们的第XX位尊贵用户"',s:'增加情感化反馈，提升满意度'},
+    {t:'立即展示"买这个的人还买了..."关联推荐',s:'趁热打铁推动复购'},
+    {t:'请求用户立即给体验打分（1–5星 NPS）',s:'趁满意度峰值收集用户反馈'},
+  ],
+  correct:0,
+  verdict:'先回答用户此刻最关心的问题，才能谈复购',
+  insights:[
+    {l:'用户首要需求',v:'38% 的用户支付后立刻想知道"什么时候到"——这个问题没被回答是最大的体验缺口',c:'var(--A)'},
+    {l:'离开的真正原因',v:'82% 立刻离开不是因为不满意，而是"没有理由留下"——订单状态信息给了用户留下来的理由',c:'var(--green)'},
+    {l:'推荐和 NPS 的时机',v:'成功页立刻推荐或要求评分，时机都太早；订单确认邮件或 3 天后发送，效果更好',c:'var(--B)'},
+  ],
+  text:'当前页面告诉用户"成功了"，但没有告诉用户"接下来会发生什么"。这就是为什么 82% 的用户立刻离开——他们没有任何理由停留。\n\n<strong>订单摘要 + 送达时间（选项 A）直接满足了用户此刻最关心的问题，同时建立了"这个平台让我感觉一切都在掌控中"的信任感。</strong>这才是复购意愿的来源，而不是推荐或评分。情感化设计（选项 B）是好的，但应该是在核心信息之上的点缀，而不是替代。',
+  gen_insights:[
+    {l:'成功页是数据盲区',v:'"支付成功后的用户下一步行为"往往没有被纳入漏斗追踪，但它直接影响复购率和客服量',c:'var(--A)'},
+    {l:'降低客服咨询量',v:'"我的包裹在哪里"是支付后最高频的客服咨询类型之一，物流追踪入口可以大幅减少这类工单',c:'var(--B)'},
+    {l:'自动化触达序列的起点',v:'成功页 + 确认邮件 + 3天后"包裹快到了"推送，可以做成完整的自动化触达序列',c:'var(--purple)'},
+    {l:'"成功页改造"的快赢价值',v:'这是 ROI 很高的快赢项目：开发成本低，对客服工单量和复购率有可量化的直接影响',c:'var(--green)'},
+  ],
+  dqs:['我们有没有追踪用户在支付成功页的停留时间和下一步行为？','支付完成后多久，用户能在 App 里看到订单状态？','"我的包裹在哪里"类型的客服咨询在总量里占多少比例？']
+},
+{
+  type:'battle', tag:'移动端按钮',
+  q:'在移动端结账最后一步，哪种支付按钮设计的点击完成率更高？',
+  ctx:'移动端占比 73%，但移动端支付完成率（84%）比桌面（92%）低 8 个百分点。分析显示问题集中在"最后一步"。',
+  A:{
+    label:'方案 A — 页面底部随滚动',
+    desc:'支付按钮在页面底部，用户需要滚动看完所有信息才能到达按钮',
+    mockup:`<div class="mock-title">订单确认</div>
+      <div style="font-size:0.58rem;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">商品小计: $89.00</div>
+      <div style="font-size:0.58rem;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">运费: $8.00</div>
+      <div style="font-size:0.58rem;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">税: $4.20</div>
+      <div style="font-size:0.62rem;font-weight:700;padding:5px 0;border-bottom:1px solid var(--border)">合计: $101.20</div>
+      <div style="font-size:0.52rem;color:var(--muted);padding:7px 0;line-height:1.5">收货地址: 123 Main Street, New York NY 10001</div>
+      <div style="font-size:0.52rem;color:var(--muted);padding:5px 0">支付方式: Visa ···· 4291</div>
+      <div class="mock-btn primary" style="width:100%;display:block;text-align:center;margin-top:10px">支付 $101.20</div>`
+  },
+  B:{
+    label:'方案 B — 吸底固定按钮',
+    desc:'支付按钮固定在屏幕底部始终可见，旁边显示总金额，随时可点击',
+    mockup:`<div class="mock-title">订单确认</div>
+      <div style="font-size:0.58rem;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">商品小计: $89.00</div>
+      <div style="font-size:0.58rem;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">运费: $8.00</div>
+      <div style="font-size:0.58rem;color:var(--muted);padding:5px 0">税: $4.20</div>
+      <div style="border-top:1px solid var(--border);margin:8px -14px -14px;padding:10px 14px 0;background:var(--s1)">
+        <div style="display:flex;justify-content:space-between;font-size:0.56rem;color:var(--muted);margin-bottom:5px"><span>总计</span><span style="font-weight:700;color:var(--text);font-size:0.65rem">$101.20</span></div>
+        <div class="mock-btn primaryB" style="width:100%;display:block;text-align:center;font-size:0.68rem;padding:11px">立即支付 $101.20 →</div>
+        <div style="text-align:center;font-size:0.5rem;color:var(--muted);margin-top:4px">🔒 安全支付</div>
+      </div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — 让支付按钮始终在拇指可及的位置',
+  insights:[
+    {l:'滚动放弃数据',v:'需要滚动才能看到支付按钮的页面，转化率比固定按钮低 11–15%（Google Mobile UX 研究）',c:'var(--A)'},
+    {l:'拇指可及区原则',v:'手机屏幕底部是右手拇指最自然的触达区域，关键操作放在这里可降低操作疲劳',c:'var(--green)'},
+    {l:'按钮文案',v:'按钮显示"支付 $101.20"而不是"支付"，可减少最后一步的决策焦虑和事后争议',c:'var(--B)'},
+  ],
+  text:'移动端与桌面端 8% 的差距，相当一部分来自"用户看完了页面，但找不到支付按钮"或"滚动过程中分心离开"。在手机上，任何需要额外操作才能触达的关键按钮都是摩擦。\n\n<strong>吸底固定按钮解决了这个问题：无论用户在页面哪个位置，支付按钮都在触手可及的地方。</strong>在按钮上显示具体金额（不是仅仅"支付"）还有一个额外好处：减少了"我不确定要扣多少钱"导致的犹豫，也减少了支付后因金额不符引发的争议。',
+  gen_insights:[
+    {l:'移动端 GMV 影响可量化',v:'移动端完成率每提升 1%，可以用"月移动端交易量 × 客单价"直接计算增量 GMV',c:'var(--A)'},
+    {l:'这是 A/B 测试的理想候选',v:'"吸底按钮 vs 随页面滚动"是成本低、见效快的 A/B 测试，通常 2 周内有显著结果',c:'var(--B)'},
+    {l:'响应式规则的自动化',v:'移动端显示吸底按钮、桌面端显示页面底部按钮，可以做成自动化的响应式配置',c:'var(--purple)'},
+    {l:'向商户展示移动端优化价值',v:'"移动端按钮位置优化带来的转化率提升"是非常具体的商户提案数据点',c:'var(--green)'},
+  ],
+  dqs:['我们有没有分别追踪移动端不同屏幕尺寸下的支付完成率？','用户在结账最后一步平均停留多长时间？有没有热力图？','我们的支付按钮目前是固定的还是随页面滚动的？']
+},
+{
+  type:'battle', tag:'安全感知',
+  q:'用户填写卡片信息时，哪种安全设计更能提升信任感，且不增加摩擦？',
+  ctx:'用研发现：即使技术上完全安全，仍有 31% 的用户在输入卡片信息时表示"有点不安"。这是感知问题，不是技术问题。',
+  A:{
+    label:'方案 A — 静态认证标志',
+    desc:'在表单底部展示一排安全认证 Logo：PCI DSS、SSL、Visa Secure',
+    mockup:`<div class="mock-label">卡号</div>
+      <div class="mock-input">4532 1197 3455 6789</div>
+      <div class="mock-row" style="margin-top:7px">
+        <div class="mock-half"><div class="mock-label">有效期</div><div class="mock-input">12/27</div></div>
+        <div class="mock-half"><div class="mock-label">CVV</div><div class="mock-input">···</div></div>
+      </div>
+      <div class="mock-divider"></div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;opacity:0.45">
+        <div style="font-size:0.48rem;border:1px solid var(--border);padding:3px 6px;color:var(--muted)">PCI DSS</div>
+        <div style="font-size:0.48rem;border:1px solid var(--border);padding:3px 6px;color:var(--muted)">SSL 256-bit</div>
+        <div style="font-size:0.48rem;border:1px solid var(--border);padding:3px 6px;color:var(--muted)">Visa Secure</div>
+        <div style="font-size:0.48rem;border:1px solid var(--border);padding:3px 6px;color:var(--muted)">3D Secure</div>
+      </div>`
+  },
+  B:{
+    label:'方案 B — 动态实时反馈',
+    desc:'输入框获得焦点时显示"加密中"，完成后显示"已加密 ✓"，卡号即时脱敏',
+    mockup:`<div class="mock-label">卡号</div>
+      <div class="mock-input success" style="display:flex;align-items:center;justify-content:space-between">
+        <span>4532 1197 ···· ····</span>
+        <span style="font-size:0.52rem;color:var(--green)">🔒 已加密</span>
+      </div>
+      <div class="mock-row" style="margin-top:7px">
+        <div class="mock-half"><div class="mock-label">有效期</div>
+          <div class="mock-input success" style="display:flex;align-items:center;justify-content:space-between"><span>12/27</span><span style="font-size:0.55rem;color:var(--green)">✓</span></div>
+        </div>
+        <div class="mock-half"><div class="mock-label">CVV</div>
+          <div class="mock-input" style="display:flex;align-items:center;justify-content:space-between;border-color:var(--B)"><span style="letter-spacing:0.1em">···</span><span style="font-size:0.5rem;color:var(--B)">加密中...</span></div>
+        </div>
+      </div>
+      <div class="mock-badge secure" style="margin-top:8px;width:100%">🛡 卡号已通过 Token 加密，我们无法看到完整信息</div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — 动态实时反馈的信任效果是静态 Logo 的 3 倍',
+  insights:[
+    {l:'眼动研究数据',v:'静态 Logo 区用户注视率不足 12%；动态变化的元素注视率超过 78%（Nielsen Norman Group）',c:'var(--A)'},
+    {l:'即时脱敏的心理效应',v:'输入后卡号后8位变为"····"，用户通过视觉直接感受到"我的信息被保护了"',c:'var(--green)'},
+    {l:'文字优于 Logo',v:'"卡号已通过 Token 加密"比任何认证图标更直接地回答了用户的疑虑',c:'var(--B)'},
+  ],
+  text:'<strong>安全感是一种体验，不是一组标志。</strong>用户在输入卡片信息时处于高度专注的"任务模式"，他们不会仔细看页面底部的认证图标（眼动研究证实了这一点），但他们会感知到界面是否在回应他们的行为。\n\n方案 B 的动态反馈是响应式的——当用户开始输入，它立刻说"我在保护你"。这比任何静态标志都更有说服力。同时，"卡号已通过 Token 加密，我们无法看到完整信息"这句话，用普通人能理解的语言直接回答了"你们会不会存我的卡号"这个最深层的疑虑。',
+  gen_insights:[
+    {l:'"安全感知"是可测量的',v:'"安全感知"应该成为支付 UX 评分的独立维度，在用研和满意度调查中单独测量，而不是只看技术安全指标',c:'var(--A)'},
+    {l:'安全感知影响授权率',v:'安全感知提升可以降低用户在高风险验证（3DS）步骤的放弃率——两个问题有直接关联',c:'var(--B)'},
+    {l:'动态指示器是纯前端实现',v:'这个功能与后端系统无关，完全在前端实现，开发成本极低，是典型的"低成本高价值"改动',c:'var(--purple)'},
+    {l:'"如何让用户感受到安全"比"我们有哪些安全认证"更有力',v:'在向商户或用户沟通安全性时，体验叙事比罗列技术认证更有说服力',c:'var(--green)'},
+  ],
+  dqs:['我们有没有做过支付页面的热力图研究？用户视线集中在哪里？','用户反馈里有没有"不确定是否安全"或"不敢输入卡号"的声音？','我们目前的安全提示是动态的还是静态的？在不同端上是否一致？']
+},
+{
+  type:'improve', tag:'3DS 验证体验',
+  q:'这个 3DS 短信验证步骤的放弃率高达 28%，远高于行业均值 12%。哪个改动最能降低放弃率？',
+  ctx:'3DS（3D Secure）是支付的额外验证步骤，发送短信验证码。这个步骤虽然保障安全，但也是重要的流失节点。',
+  brokenMockup:`<div style="text-align:center;padding:8px 0">
+    <div style="font-size:0.52rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:7px">安全验证</div>
+    <div style="font-size:0.72rem;font-weight:700;margin-bottom:4px">请输入验证码</div>
+    <div style="font-size:0.56rem;color:var(--muted);margin-bottom:12px">验证码已发送至您的手机</div>
+    <div class="mock-input" style="text-align:center;letter-spacing:0.3em;font-size:0.85rem">_ _ _ _ _ _</div>
+    <div style="font-size:0.52rem;color:var(--muted);margin-top:7px">未收到验证码？</div>
+    <div class="mock-btn primary" style="margin-top:10px;width:100%;display:block;text-align:center">确认</div>
+  </div>`,
+  opts:[
+    {t:'单一输入框 + 启用短信自动填入（autocomplete="one-time-code"）',s:'手机检测到验证码后一键填入，无需切换 App 或手动输入'},
+    {t:'显示验证码发到哪个手机号（末四位）+ 倒计时显示有效期',s:'消除"码发哪了？还有效吗？"的不确定感'},
+    {t:'在页面顶部加进度条显示"第3步/共3步 · 最后一步"',s:'让用户知道这是最后一步，减少放弃意愿'},
+    {t:'加入"换一种验证方式"选项（如邮件验证码）',s:'给无法收到短信的用户提供备选，减少卡死流程的情况'},
+  ],
+  correct:0,
+  verdict:'自动填入是降低 3DS 放弃率 ROI 最高的单一改动',
+  insights:[
+    {l:'自动填入的影响',v:'iOS/Android 短信自动填入功能可将 OTP 输入时间从平均 22 秒降至 3 秒',c:'var(--green)'},
+    {l:'三重摩擦叠加',v:'切换 App → 记住6位数字 → 切回来手动输入 → 担心超时，每一步都是放弃机会',c:'var(--A)'},
+    {l:'实现成本接近零',v:'input autocomplete="one-time-code" 是标准 HTML 属性，iOS 和 Android 均原生支持',c:'var(--B)'},
+  ],
+  text:'<strong>28% 的放弃率意味着每 4 个快要完成支付的用户中就有 1 个在最后一步离开——这是非常昂贵的损耗。</strong>\n\n根本原因是：用户需要切换到短信 App 看验证码，记住 6 位数字，再切回来手动输入，还要担心"超时了吗"。这是 4 重独立的摩擦叠加在一起。\n\n自动填入（选项 A）几乎一次性消除了所有摩擦：系统检测到 OTP 短信后，键盘上方直接出现"填入验证码"提示，用户一键完成，不需要切换 App，不需要记数字。选项 B（显示手机号末四位 + 倒计时）也是很好的改动，应该配合选项 A 一起实施。',
+  gen_insights:[
+    {l:'3DS 放弃率是专项指标',v:'3DS 步骤放弃率应该单独追踪，与整体支付放弃率分开分析——两者的原因和解法完全不同',c:'var(--A)'},
+    {l:'每降低 1% 的直接 GMV 影响',v:'3DS 放弃率每降低 1%，对授权成功率的影响可以用"月3DS触发量 × 客单价"直接计算',c:'var(--B)'},
+    {l:'技术实现极其简单',v:'autocomplete="one-time-code" + inputmode="numeric" 两个 HTML 属性，开发时间约 30 分钟',c:'var(--purple)'},
+    {l:'"3DS 体验优化"的商业提案价值',v:'对于高交易量的商户，3DS 放弃率每降低 1% 的增量 GMV 计算，是非常有说服力的提案切入点',c:'var(--green)'},
+  ],
+  dqs:['我们目前 3DS 验证步骤的放弃率是多少？有没有按卡组分析差异？','我们的 OTP 输入框有没有设置 autocomplete="one-time-code"？','用户在 3DS 步骤停留多长时间？超时重发验证码的比例是多少？']
+},
+{
+  type:'battle', tag:'支付成功通知',
+  q:'支付完成后，哪种通知设计更能建立用户信心并减少客服压力？',
+  ctx:'背景：平台客服数据显示"我的付款有没有成功"是第二高频咨询，占客服总量的 18%。',
+  A:{
+    label:'方案 A — Toast + 自动跳转',
+    desc:'支付成功后显示绿色 Toast 提示"支付成功！"，3 秒后自动跳回首页',
+    mockup:`<div style="background:var(--bg);padding:6px">
+      <div class="mock-toast"><span>✓</span><span style="font-size:0.6rem;font-weight:600">支付成功！</span><span style="margin-left:auto;font-size:0.52rem;opacity:0.7">3秒后跳转</span></div>
+      <div style="margin-top:10px;font-size:0.53rem;color:var(--muted);text-align:center">正在返回首页...</div>
+      <div style="display:flex;gap:7px;margin-top:14px">
+        <div style="flex:1;background:var(--s2);border:1px solid var(--border);padding:10px;text-align:center;font-size:0.56rem;color:var(--muted)">商品推荐</div>
+        <div style="flex:1;background:var(--s2);border:1px solid var(--border);padding:10px;text-align:center;font-size:0.56rem;color:var(--muted)">限时活动</div>
+      </div>
+    </div>`
+  },
+  B:{
+    label:'方案 B — 完整确认页',
+    desc:'停留在确认页，清晰显示订单信息、预计送达时间、物流追踪入口，有明确的下一步引导',
+    mockup:`<div style="text-align:center;padding:6px 0 8px">
+      <div style="font-size:1.1rem">🎉</div>
+      <div style="font-size:0.72rem;font-weight:800;margin:4px 0 2px">支付成功</div>
+      <div style="font-size:0.56rem;color:var(--green)">订单 #ORD-2847561 已确认</div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--border);padding:9px 11px;margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:0.56rem;margin-bottom:3px"><span style="color:var(--muted)">已支付</span><span style="font-weight:700;color:var(--gold)">$101.20</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.56rem"><span style="color:var(--muted)">预计送达</span><span style="color:var(--green)">3月15–17日</span></div>
+    </div>
+    <div class="mock-btn primaryB" style="width:100%;display:block;text-align:center;font-size:0.58rem;padding:8px;margin-bottom:5px">📦 追踪订单</div>
+    <div class="mock-btn ghost" style="width:100%;display:block;text-align:center;font-size:0.56rem;padding:7px">继续购物</div>`
+  },
+  correct:'B', winnerSide:'B',
+  verdict:'方案 B 胜出 — 完整确认页直接解决"支付有没有成功"这个高频客服问题',
+  insights:[
+    {l:'客服数据直接关联',v:'"支付是否成功"占 18% 客服量，完整确认页可将这类咨询降低 60–70%',c:'var(--A)'},
+    {l:'Toast 的根本缺陷',v:'3 秒 Toast + 自动跳转让用户感觉"被赶走了"，来不及确认任何信息，反而增加焦虑',c:'var(--green)'},
+    {l:'满意度峰值时机',v:'刚完成支付的用户处于满意度峰值，这是建立品牌信任和引导下一步行动的最佳时机',c:'var(--B)'},
+  ],
+  text:'方案 A 用 Toast 告知了用户"成功了"，但随即把他带走了，用户来不及确认任何信息。这就是 18% 客服咨询的根本来源——用户根本来不及看清楚。\n\n<strong>方案 B 把成功页变成了一个信息枢纽：已支付金额、订单号、预计送达时间、物流追踪入口——把用户所有可能的疑问一次性回答。</strong>这一个页面可以直接减少将近 1/5 的客服工单，对运营成本的影响是可以直接量化的。',
+  gen_insights:[
+    {l:'用客服数据量化改造价值',v:'"每减少 1% 客服量节省的成本"，可以直接用于计算确认页改造的业务价值，让这个 UX 改动有具体的 ROI',c:'var(--A)'},
+    {l:'减少支付争议',v:'确认页显示正确的交易金额，可减少用户因"扣款金额和我想的不一样"产生的误报争议和退款',c:'var(--B)'},
+    {l:'自动化的起点',v:'确认页内容（送达时间、追踪号）可以实时从订单系统 API 拉取，完全自动化，无需人工维护',c:'var(--purple)'},
+    {l:'"减少客服量"作为商户价值',v:'对商户来说，"支付体验优化减少售后客服压力"是一个比"提升转化率"更容易理解的价值点',c:'var(--green)'},
+  ],
+  dqs:['我们"支付成功"后的页面停留时间是多少？用户主动离开还是被自动跳转？','支付成功后的客服咨询里，"是否成功"和"何时到达"各占多少比例？','我们的支付确认邮件多久发出？页面和邮件的信息是否一致？']
+}
+];
+
+// ─── STATE ──────────────────────────────────────────────────────
+let cur=0, score=0;
+let votes=QS.map(q=>q.type==='battle'?{A:0,B:0}:new Array(q.opts.length).fill(0));
+let myVote=new Array(QS.length).fill(null);
+let revealed=new Array(QS.length).fill(false);
+
+function render(){
+  updateProgress();
+  const q=QS[cur];
+  const wrap=document.getElementById('q-wrap');
+  wrap.innerHTML='';
+  wrap.className='q-wrap';
+  const tagClass=q.type==='battle'?'tag-battle':'tag-improve';
+  const tagLabel=q.type==='battle'?'⚔ A vs B 对决':'🔧 找出改进点';
+  wrap.innerHTML=`
+    <div class="q-meta">
+      <div class="q-num">Q${cur+1} / ${QS.length}</div>
+      <div class="q-tag ${tagClass}">${tagLabel}</div>
+      <div class="q-tag" style="border-color:rgba(255,255,255,0.08);color:var(--muted)">${q.tag}</div>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-ctx">${q.ctx}</div>
+    ${q.type==='battle'?renderBattle(q):renderImprove(q)}
+    <div class="controls">
+      <button class="btn primary" id="reveal-btn" onclick="doReveal()" ${myVote[cur]===null?'disabled':''}>📊 揭晓答案</button>
+      <button class="btn" onclick="simulate()">👥 模拟投票</button>
+      <button class="btn ghost" onclick="resetQ()">↺ 重置</button>
+      <div class="voter-pill"><span class="voter-n" id="voter-n">${totalVotes()}</span> 票</div>
+    </div>
+    <div class="reveal-panel ${revealed[cur]?'show':''}" id="reveal-panel">
+      ${revealed[cur]?buildReveal(q):''}
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="go(cur-1)" ${cur===0?'disabled':''}>← 上一题</button>
+      <div class="score-pill">得分 <span>${score}</span> / ${QS.length}</div>
+      <button class="nav-btn fwd" onclick="go(cur+1)">${cur===QS.length-1?'完成测验 →':'下一题 →'}</button>
+    </div>`;
+  if(revealed[cur]) setTimeout(()=>animateBars(),50);
+}
+
+function renderBattle(q){
+  const dis=revealed[cur];
+  return `<div class="battle-arena">
+    <div class="battle-side side-A ${myVote[cur]==='A'?'chosen-A':''} ${revealed[cur]&&q.winnerSide==='A'?'is-winner':''} ${revealed[cur]&&q.winnerSide!=='A'?'is-loser':''}"
+      id="side-A" onclick="${dis?'':'castBattle(\'A\')'}" style="cursor:${dis?'default':'pointer'}">
+      <div class="side-header">
+        <div class="side-letter">A</div>
+        <div class="side-label">${q.A.label}</div>
+        ${revealed[cur]&&q.winnerSide==='A'?'<div class="winner-crown">👑</div>':''}
+      </div>
+      <div class="side-body">
+        <div class="side-mockup">${q.A.mockup}</div>
+        <div class="side-desc">${q.A.desc}</div>
+        <div class="vote-bar-mini"><div class="vote-bar-fill" id="bar-A" style="background:var(--A)"></div></div>
+        <div class="vote-pct" id="pct-A">${revealed[cur]?pctVal('A',q)+'%':''}</div>
+      </div>
+    </div>
+    <div class="vs-col"><div class="vs-line"></div><div class="vs-text">VS</div></div>
+    <div class="battle-side side-B ${myVote[cur]==='B'?'chosen-B':''} ${revealed[cur]&&q.winnerSide==='B'?'is-winner':''} ${revealed[cur]&&q.winnerSide!=='B'?'is-loser':''}"
+      id="side-B" onclick="${dis?'':'castBattle(\'B\')'}" style="cursor:${dis?'default':'pointer'}">
+      <div class="side-header">
+        <div class="side-letter">B</div>
+        <div class="side-label">${q.B.label}</div>
+        ${revealed[cur]&&q.winnerSide==='B'?'<div class="winner-crown">👑</div>':''}
+      </div>
+      <div class="side-body">
+        <div class="side-mockup">${q.B.mockup}</div>
+        <div class="side-desc">${q.B.desc}</div>
+        <div class="vote-bar-mini"><div class="vote-bar-fill" id="bar-B" style="background:var(--B)"></div></div>
+        <div class="vote-pct" id="pct-B">${revealed[cur]?pctVal('B',q)+'%':''}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderImprove(q){
+  return `<div class="improve-area">
+    <div class="broken-ui"><div class="broken-label">⚠ 当前设计</div>${q.brokenMockup}</div>
+    <div class="improve-options">
+      ${q.opts.map((o,i)=>`
+        <button class="imp-opt ${myVote[cur]===i?'picked':''} ${revealed[cur]&&i===q.correct?'correct-ans':''} ${revealed[cur]&&myVote[cur]===i&&i!==q.correct?'wrong-ans':''}"
+          onclick="castImprove(${i})" ${revealed[cur]?'disabled':''}>
+          <div class="imp-num">${String.fromCharCode(65+i)}</div>
+          <div><div class="imp-text">${o.t}</div><div class="imp-sub">${o.s}</div></div>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function buildReveal(q){
+  const wTag=q.type==='battle'
+    ?`<span class="winner-tag winner-${q.winnerSide}">方案 ${q.winnerSide} 胜出</span>`
+    :`<span class="winner-tag winner-none">✓ 解析</span>`;
+  return `
+    <div class="rp-header"><div class="rp-verdict">${q.verdict}${wTag}</div></div>
+    <div class="rp-body">
+      <div class="rp-insights">${q.insights.map(i=>`
+        <div class="rp-insight" style="--ic:${i.c}">
+          <div class="rp-ilabel">${i.l}</div>
+          <div class="rp-ival">${i.v}</div>
+        </div>`).join('')}
+      </div>
+      <div class="rp-text" id="rp-text">${q.text.replace(/\n\n/g,'<br><br>')}</div>
+      <div class="gen-insights">
+        <div class="gi-title">💡 延伸思考</div>
+        <div class="gi-grid">${q.gen_insights.map(g=>`
+          <div class="gi-item" style="--ic:${g.c}">
+            <div class="gi-label">${g.l}</div>
+            <div class="gi-val">${g.v}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="dq-strip">
+      <div class="dq-strip-title">💬 讨论问题</div>
+      ${q.dqs.map(d=>`<div class="dq-item">${d}</div>`).join('')}
+    </div>`;
+}
+
+function castBattle(side){
+  if(revealed[cur])return;
+  if(myVote[cur])votes[cur][myVote[cur]]--;
+  myVote[cur]=side;
+  votes[cur][side]++;
+  document.getElementById('reveal-btn').disabled=false;
+  document.getElementById('voter-n').textContent=totalVotes();
+  document.getElementById('side-A').className=`battle-side side-A${side==='A'?' chosen-A':''}`;
+  document.getElementById('side-B').className=`battle-side side-B${side==='B'?' chosen-B':''}`;
+}
+
+function castImprove(idx){
+  if(revealed[cur])return;
+  if(myVote[cur]!==null)votes[cur][myVote[cur]]--;
+  myVote[cur]=idx;
+  votes[cur][idx]++;
+  document.getElementById('reveal-btn').disabled=false;
+  document.getElementById('voter-n').textContent=totalVotes();
+  document.querySelectorAll('.imp-opt').forEach((el,i)=>el.classList.toggle('picked',i===idx));
+}
+
+function simulate(){
+  if(revealed[cur])return;
+  const q=QS[cur];
+  const n=4+Math.floor(Math.random()*5);
+  for(let i=0;i<n;i++){
+    if(q.type==='battle'){
+      const pick=Math.random()<0.55?q.correct:q.correct==='A'?'B':'A';
+      votes[cur][pick]++;
+    } else {
+      const pick=Math.random()<0.4?q.correct:Math.floor(Math.random()*q.opts.length);
+      votes[cur][pick]++;
+    }
+  }
+  document.getElementById('voter-n').textContent=totalVotes();
+  document.getElementById('reveal-btn').disabled=false;
+}
+
+function doReveal(){
+  if(revealed[cur])return;
+  revealed[cur]=true;
+  const q=QS[cur];
+  const correct=q.type==='battle'?q.winnerSide:q.correct;
+  if(myVote[cur]!==null&&myVote[cur]===correct)score++;
+  updateProgress();
+  render();
+  setTimeout(()=>{
+    const rp=document.getElementById('reveal-panel');
+    if(rp)rp.scrollIntoView({behavior:'smooth',block:'start'});
+    typeReveal();
+  },80);
+}
+
+function typeReveal(){
+  const el=document.getElementById('rp-text');
+  if(!el)return;
+  const html=el.innerHTML;
+  el.innerHTML='';
+  el.classList.add('typing');
+  const chars=[...html];
+  let i=0;
+  const t=setInterval(()=>{
+    if(i<chars.length){el.innerHTML=chars.slice(0,i+1).join('');i++;}
+    else{clearInterval(t);el.classList.remove('typing');el.innerHTML=html;}
+  },9);
+}
+
+function animateBars(){
+  const q=QS[cur];
+  if(q.type!=='battle')return;
+  const total=(votes[cur].A||0)+(votes[cur].B||0)||1;
+  const pA=Math.round((votes[cur].A||0)/total*100);
+  const bA=document.getElementById('bar-A');
+  const bB=document.getElementById('bar-B');
+  const pA2=document.getElementById('pct-A');
+  const pB2=document.getElementById('pct-B');
+  requestAnimationFrame(()=>{
+    if(bA)bA.style.width=pA+'%';
+    if(bB)bB.style.width=(100-pA)+'%';
+    if(pA2)pA2.textContent=pA+'%';
+    if(pB2)pB2.textContent=(100-pA)+'%';
+  });
+}
+
+function pctVal(side,q){
+  const total=(votes[cur].A||0)+(votes[cur].B||0)||1;
+  return Math.round((votes[cur][side]||0)/total*100);
+}
+
+function totalVotes(){
+  const q=QS[cur];
+  if(q.type==='battle')return (votes[cur].A||0)+(votes[cur].B||0);
+  return votes[cur].reduce((a,b)=>a+b,0);
+}
+
+function resetQ(){
+  if(revealed[cur]){
+    const q=QS[cur];
+    const correct=q.type==='battle'?q.winnerSide:q.correct;
+    if(myVote[cur]===correct)score--;
+    revealed[cur]=false;
+  }
+  votes[cur]=QS[cur].type==='battle'?{A:0,B:0}:new Array(QS[cur].opts.length).fill(0);
+  myVote[cur]=null;
+  updateProgress();
+  render();
+}
+
+function go(idx){
+  if(idx>=QS.length){showFinish();return;}
+  if(idx<0)return;
+  cur=idx;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProgress(){
+  const done=revealed.filter(Boolean).length;
+  const pct=Math.round(done/QS.length*100);
+  document.getElementById('prog-text').textContent=`Question ${cur+1} of ${QS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('hs-done').textContent=done;
+  document.getElementById('hs-score').textContent=score;
+}
+
+function showFinish(){
+  document.getElementById('quiz').style.display='none';
+  const f=document.getElementById('finish');
+  f.classList.add('show');
+  document.getElementById('f-score').innerHTML=`${score}<span class="finish-denom">/${QS.length}</span>`;
+  const msgs=[
+    [0,4,'支付 UX 的水很深，这次只是入门 💪 每道题的延伸分析都值得细读'],
+    [5,7,'掌握了核心支付 UX 原则，继续用数据验证你的设计直觉 🎯'],
+    [8,9,'支付 UX 直觉相当准确，可以开始用这些原则影响团队决策了 🔥'],
+    [10,10,'满分！这些原则已经是你的本能了 🏆'],
+  ];
+  const m=msgs.find(([a,b])=>score>=a&&score<=b)||msgs[0];
+  document.getElementById('f-title').textContent=`${score} 分`;
+  document.getElementById('f-msg').textContent=m[2];
+}
+
+function restart(){
+  cur=0;score=0;
+  votes=QS.map(q=>q.type==='battle'?{A:0,B:0}:new Array(q.opts.length).fill(0));
+  myVote=new Array(QS.length).fill(null);
+  revealed=new Array(QS.length).fill(false);
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('finish').classList.remove('show');
+  updateProgress();
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>
